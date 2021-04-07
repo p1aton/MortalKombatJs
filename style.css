@@ -146,6 +146,7 @@ body {
     background-color: #0431f9;
     height: 100%;
     width: 90%;
+    padding-left: 10px;
 }
 
 .name {
@@ -156,6 +157,7 @@ body {
     letter-spacing: 2px;
     color: #efefef;
     top: 0;
+    margin-left: 195px;
 }
 
 .player1 .name {
