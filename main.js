@@ -1,7 +1,7 @@
 const $arenas = document.querySelector('.arenas');
 const $randomButton = document.querySelector('.button');
 const $root = document.querySelector('.root');
-const $button = document.querySelector('reloadWrap, button');
+
 
 const player1 = {
   player: 1,
@@ -40,7 +40,7 @@ function elHP() {
 
 function renderProgressbarHP() {
   return this.elHP().style.width = this.hp + '%';
-  
+
 }
 
 function renderHP() {
@@ -55,7 +55,6 @@ function changeHP(num) {
 
   if (this.hp <= 0) {
     this.hp = 0;
-    // player.hp === player1.hp ? $arenas.appendChild(playerWin(player2.name)) : $arenas.appendChild(playerWin(player1.name));
   }
 
 }
@@ -87,6 +86,7 @@ $randomButton.addEventListener('click', function () {
 
   if (player1.hp === 0 || player2.hp === 0) {
     $randomButton.disabled = true;
+    createReloadButton();
   }
 
   if (player1.hp === 0 && player1.hp < player2.hp) {
@@ -96,6 +96,7 @@ $randomButton.addEventListener('click', function () {
   } else if (player1.hp === 0 && player2.hp === 0) {
     $arenas.appendChild(playerWin())
   }
+
 
 })
 
@@ -113,27 +114,24 @@ function createElement(tag, className) {
 
 
 function createReloadButton() {
-  
-  
-  const $button = createElement('div');
-  $button.innerText = 'Restart';
-  $button.classList.add('reloadWrap', 'button')
 
-  $root.appendChild($button);
+  const $reloadDiv = createElement('div', 'reloadWrap');
+  $arenas.appendChild($reloadDiv);
+  
+  const $reloadWrap = createElement('button', 'button')
+  $reloadWrap.innerText = 'Restart';
+
+  $reloadDiv.appendChild($reloadWrap);
+
+  $reloadWrap.addEventListener('click', function () {
+    console.log('Click2');
+    
+    window.location.reload();
+    
+    
+  })
 
 }
-
-$button.addEventListener('click', function() {
-  console.log('Click2');
-
-  if (player1.hp === 0 || player2.hp === 0) {
-
-    createReloadButton();
-    window.location.reload();
-  }
-  
-})
-
 
 
 function createPlayer(object) {
