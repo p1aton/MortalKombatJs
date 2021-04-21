@@ -1,99 +1,13 @@
 import logs from './logs.js';
-import {player1, player2 } from './player.js';
+import { player1, player2 } from './player.js';
+import { createPlayer, playerWin, randomHP, createReloadButton, createElement, showResult } from './createPlayer.js';
+import { HIT, ATTACK } from './attackConst.js'
 
-const $arenas = document.querySelector('.arenas');
+
 // const $randomButton = document.querySelector('.button');
-const $formFight = document.querySelector('.control');
-
 const $chat = document.querySelector('.chat');
-
-const HIT = {
-  head: 30,
-  body: 25,
-  foot: 20,
-}
-
-
-const ATTACK = ['head', 'body', 'foot'];
-
-
-function playerWin(name) {
-  const $winnerTitle = createElement('div', 'winnerTitle');
-  if (name) {
-    $winnerTitle.innerText = name + ' win';
-  } else {
-    $winnerTitle.innerText = 'draw'
-    drawLogs('draw');
-  }
-
-  return $winnerTitle;
-}
-
-
-function randomHP(num) {
-  return Math.ceil(Math.random() * num);
-}
-
-
-function createElement(tag, className) {
-  const $tag = document.createElement(tag);
-
-  if (className) {
-
-    $tag.classList.add(className);
-
-  }
-
-  return $tag;
-}
-
-
-function createReloadButton() {
-
-  const $reloadDiv = createElement('div', 'reloadWrap');
-  $arenas.appendChild($reloadDiv);
-
-  const $reloadWrap = createElement('button', 'button')
-  $reloadWrap.innerText = 'Restart';
-
-  $reloadDiv.appendChild($reloadWrap);
-
-  $reloadWrap.addEventListener('click', function () {
-    console.log('Click2');
-
-    window.location.reload();
-
-
-  })
-
-}
-
-
-function createPlayer(object) {
-  const $player = createElement('div', 'player' + object.player);
-
-  const $progressbar = createElement('div', 'progressbar');
-  $player.appendChild($progressbar);
-
-  const $life = createElement('div', 'life');
-  $life.style.width = '100%';
-  $life.innerText = object.hp;
-  $progressbar.appendChild($life);
-
-  const $name = createElement('div', 'name');
-  $name.innerText = object.name;
-  $progressbar.appendChild($name);
-
-  const $character = createElement('div', 'character');
-  $player.appendChild($character);
-
-  const $img = createElement('img');
-  $img.src = object.img;
-  $character.appendChild($img);
-
-  return $player;
-
-}
+export const $formFight = document.querySelector('.control');
+export const $arenas = document.querySelector('.arenas');
 
 
 
@@ -129,79 +43,56 @@ function playerAttack() {
 
 }
 
-function showResult() {
-
-  if (player1.hp === 0 || player2.hp === 0) {
-    $formFight.disabled = true;
-    createReloadButton();
-  }
-
-  if (player1.hp === 0 && player1.hp < player2.hp) {
-    $arenas.appendChild(playerWin(player2.name))
-    endLogs('end', player2.name, player1.name);
-  } else if (player2.hp === 0 && player2.hp < player1.hp) {
-    $arenas.appendChild(playerWin(player1.name))
-    endLogs('end', player1.name, player2.name);
-  } else if (player1.hp === 0 && player2.hp === 0) {
-    $arenas.appendChild(playerWin())
-  }
-
-}
-
-function switchLook(type) {
-  switch(type) {
-    case 'hit':
-      return type;
-    case 'defence':
-      return type;
-
-  }
-}
-
-function generateLogs(type, player1, player2, hits, damage) {
+function getTime() {
   const date = new Date();
-  
-  const text = logs[switchLook(type)][randomHP(logs[type].length)- 1]
-    .replace('[playerKick]', player1.name)
-    .replace('[playerDefence]', player2.name)
-    .replace('[time]', date.getHours() +':'+ date.getMinutes() +':'+ date.getSeconds())
-    .replace('[-player.hp]', '- '+ hits)
-    .replace('[hp/100]', damage+'/100');
-  
+  return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+}
+
+function getTextLog(type, playerName1, playerName2, hits, damage) {
+  switch (type) {
+    case 'start':
+      return logs[type]
+        .replace('[player1]', playerName1)
+        .replace('[player2]', playerName2)
+        .replace('[time]', getTime());
+      break;
+    case 'hit':
+      return logs[type][randomHP(logs[type].length - 1) - 1]
+        .replace('[playerKick]', playerName1)
+        .replace('[playerDefence]', playerName2)
+        .replace('[time]', getTime())
+        .replace('[-player.hp]', '- ' + hits)
+        .replace('[hp/100]', damage + '/100');
+      break;
+    case 'defence':
+      return logs[type][randomHP(logs[type].length - 1) - 1]
+        .replace('[playerKick]', playerName1)
+        .replace('[playerDefence]', playerName2)
+        .replace('[time]', getTime())
+      break;
+    case 'end':
+      return logs[type][randomHP(logs[type].length - 1) - 1]
+        .replace('[playerWins]', playerName1)
+        .replace('[playerLose]', playerName2)
+      break;
+    case 'draw':
+      return logs[type]
+      break;
+
+  }
+}
+
+
+export function generateLogs(type, player1 = {}, player2 = {}, hits, damage) {
+
+
+  const text = getTextLog(type, player1.name, player2.name, hits, damage);
+
   const el = `<p>${text}</p>`;
   $chat.insertAdjacentHTML('afterbegin', el);
-  
+
 }
 
-
-function startLogs(type, player1, player2) {
-  const date = new Date();
-
-  const start = logs[type]
-    .replace('[player1]', player1.name)
-    .replace('[player2]', player2.name)
-    .replace('[time]', date.getHours() +':'+ date.getMinutes() +':'+ date.getSeconds());
-
-  const el = `<p>${start}</p>`;
-  $chat.insertAdjacentHTML('afterbegin', el);
-}
-
-function endLogs(type, playerWins, playerLose) {
-
-  const end = logs[type][randomHP(logs[type].length)- 1]
-    .replace('[playerWins]', playerWins)
-    .replace('[playerLose]', playerLose)
-
-  const el = `<p>${end}</p>`;
-  $chat.insertAdjacentHTML('afterbegin', el);
-}
-
-function drawLogs(type) {
-  const draw = logs[type]
-
-  const el = `<p>${draw}</p>`;
-  $chat.insertAdjacentHTML('afterbegin', el);
-}
 
 $formFight.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -234,7 +125,14 @@ $formFight.addEventListener('submit', function (e) {
 })
 
 
-$arenas.appendChild(createPlayer(player1));
-$arenas.appendChild(createPlayer(player2));
+export function init() {
 
-startLogs('start', player1, player2);
+  $arenas.appendChild(createPlayer(player1));
+  $arenas.appendChild(createPlayer(player2));
+
+  generateLogs('start', player1, player2)
+}
+
+init();
+
+
