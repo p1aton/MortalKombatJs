@@ -1,8 +1,5 @@
-import {player1, player2 } from './player.js';
-import {generateLogs, $formFight, init, $arenas} from './main.js'
-
-
-
+import { generateLogs, enemyAttack, playerAttack } from './utils.js';
+import {Game, $formFight, $arenas} from './module/game.js';
 
 
 
@@ -85,24 +82,7 @@ function createElement(tag, className) {
   return $tag;
 }
 
-function showResult() {
-
-  if (player1.hp === 0 || player2.hp === 0) {
-    $formFight.disabled = true;
-    createReloadButton();
-  }
-
-  if (player1.hp === 0 && player1.hp < player2.hp) {
-    $arenas.appendChild(playerWin(player2.name))
-    generateLogs('end', player2, player1);
-  } else if (player2.hp === 0 && player2.hp < player1.hp) {
-    $arenas.appendChild(playerWin(player1.name))
-    generateLogs('end', player1, player2);
-  } else if (player1.hp === 0 && player2.hp === 0) {
-    $arenas.appendChild(playerWin())
-  }
-
-}
 
 
-export { createPlayer, playerWin, randomHP, createReloadButton, createElement, showResult};
+
+export { createPlayer, playerWin, randomHP, createReloadButton, createElement};
